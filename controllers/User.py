@@ -3,6 +3,10 @@ from flask import jsonify, request, redirect, url_for
 from schemas import UserSchema
 
 
+def del_user():
+    pass
+
+
 def get_all_users():
     users = User.objects.all()
     return jsonify({"result": users})

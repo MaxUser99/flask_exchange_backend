@@ -3,6 +3,10 @@ from flask import jsonify, request
 from schemas import CategorySchema
 
 
+def del_category():
+    pass
+
+
 def get_all_categories():
     categories = Category.objects.all()
     return jsonify({"result": categories})
