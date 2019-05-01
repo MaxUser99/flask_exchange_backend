@@ -3,5 +3,14 @@ v = Validator()
 
 
 def is_valid(user):
-    schema = {'name': {'type': 'string'}, 'email': {'type': 'string'}}
+    schema = {
+        'name': {
+            'required': True,
+            'type': 'string'
+        },
+        'email': {
+            'required': True,
+            'type': 'string'
+        }
+    }
     return v.validate(user, schema)

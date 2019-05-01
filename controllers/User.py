@@ -10,12 +10,10 @@ def all_users():
 
 def add_user():
     user_data = request.get_json()
-    print(user_data)
-    print(user_data["email"])
     is_valid = UserSchema.is_valid(user_data)
+    print("is_valid: ", is_valid)
     if is_valid:
-        user = User(name=user_data["name"], email=user_data["email"])
-        user.save()
+        User(name=user_data["name"], email=user_data["email"]).save()
     return jsonify({"isValid": is_valid}), 200 if is_valid else 400
 
 
