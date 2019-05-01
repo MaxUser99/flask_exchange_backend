@@ -9,9 +9,7 @@ def all_users():
 
 
 def add_user():
-    data = request.get_json()
-    print(data)
-    return jsonify({
-        "json_data": data,
-        "isValid": UserSchema.validate(data)
-    })
+    user_data = request.get_json()
+    print(user_data)
+    is_valid = UserSchema.is_valid(user_data)
+    return jsonify({"isValid": is_valid}), 200 if is_valid else 400

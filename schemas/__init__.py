@@ -1,1 +1,1 @@
-from .UserSchema import validate
+from .UserSchema import is_valid
