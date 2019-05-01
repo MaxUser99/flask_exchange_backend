@@ -3,7 +3,7 @@ from flask import jsonify, request, redirect, url_for
 from schemas import UserSchema
 
 
-def all_users():
+def get_all_users():
     users = User.objects.all()
     return jsonify({"result": users})
 
@@ -17,6 +17,6 @@ def add_user():
     return jsonify({"isValid": is_valid}), 200 if is_valid else 400
 
 
-def clear():
+def clear_all_users():
     User.objects.delete()
     return redirect(url_for("all_users"))

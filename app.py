@@ -2,7 +2,9 @@ import os
 import sys
 from flask import Flask
 from flask_mongoengine import MongoEngine
+from cerberus import Validator
 
+validator = Validator()
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '../../')))
 
 app = Flask(__name__)

@@ -1,5 +1,4 @@
-from cerberus import Validator
-v = Validator()
+from app import validator
 
 
 def is_valid(user):
@@ -13,4 +12,4 @@ def is_valid(user):
             'type': 'string'
         }
     }
-    return v.validate(user, schema)
+    return validator.validate(user, schema)
