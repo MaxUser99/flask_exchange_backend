@@ -3,5 +3,5 @@ from app import db
 
 # TODO add tasks list
 class Subcategory(db.Document):
-    category_id = db.ReferenceField('Category')
+    category_id = db.ReferenceField('Category', reverse_delete_rule=db.CASCADE)
     subcategories = db.ListField(db.ReferenceField('self'))
