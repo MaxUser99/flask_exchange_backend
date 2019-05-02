@@ -3,13 +3,8 @@ from flask import jsonify, request
 from schemas import CategorySchema
 
 
-def get_category_by_name(name):
+def get_one_category(name):
     category = Category.objects.get(name=name)
-    return jsonify({'result': category})
-
-
-def get_category_by_id(id):
-    category = Category.objects.get(id=id)
     return jsonify({'result': category})
 
 
