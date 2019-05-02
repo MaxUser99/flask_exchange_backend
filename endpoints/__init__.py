@@ -1,4 +1,3 @@
 from .User import *
-from .Categories import *
-from .Subcategory import *
+from .Category import *
 from .index import *
