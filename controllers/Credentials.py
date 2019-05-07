@@ -16,7 +16,7 @@ def sign_in():
     user = None
     if is_valid:
         credentials = Credentials(name=data['name'], login=data['login'], password=data['password']).save()
-        user = User(rating=0, level=0, posted_tasks=[], subscribed_tasks=[], credentials=credentials.id).save()
+        user = User(rating=0, level=0, posted_tasks=[], subscribed_tasks=[]).save()
         credentials.update(set_user_id=user.id)
     return jsonify({'user': user, 'credentials': credentials})
 
@@ -25,14 +25,11 @@ def sign_in():
 def log_in():
     data = request.get_json()
     is_valid = CredentialsSchema.is_valid_for_login(data)
-    user = None
     credentials = None
     if is_valid and contains_login(data['login']):
         credentials = Credentials.objects.get(login=data['login'])
-        user = User.credentials.get(id=credentials.user_id)
     return jsonify({
         'isValid': is_valid,
-        'user': user,
         'credentials': credentials
     })
 
