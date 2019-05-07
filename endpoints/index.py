@@ -7,3 +7,4 @@ from app import app
 def index():
     count = User.objects.count()
     return jsonify({"cont": count})
+    # return "hi"
