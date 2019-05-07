@@ -1,15 +1,10 @@
 from app import validator
 
 
-def is_valid(user):
+def is_valid_for_update(data):
     schema = {
-        'name': {
-            'required': True,
-            'type': 'string'
-        },
-        'email': {
-            'required': True,
-            'type': 'string'
-        }
+        'id': {'type': 'string', 'required': True},
+        'rating': {'type': 'number'},
+        'level': {'type': 'number'},
     }
-    return validator.validate(user, schema)
+    return validator.validate(data, schema)
