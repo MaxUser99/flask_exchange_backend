@@ -1,16 +1,17 @@
 from models import Category
-from flask import jsonify, request
+from flask import request
 from schemas import CategorySchema
+from app import CORSify
 
 
 def get_all_categories():
     categories = Category.objects.all()
-    return jsonify({"result": categories})
+    return CORSify({"result": categories})
 
 
 def get_one_category(name):
     subcat = Category.objects.get(name=name) if Category.objects(name=name).count() else None
-    return jsonify({'result': subcat})
+    return CORSify({'result': subcat})
 
 
 def add_category():
@@ -26,13 +27,12 @@ def add_category():
         new_category = Category(name=data['name'], parent_id=parent.id)\
             if parent\
             else Category(name=data['name'])
-
         new_category.save()
 
         if parent:
             parent.update(push__subcategories=new_category.id)
 
-    return jsonify({"isValid": is_valid}), 200 if is_valid else 400
+    return CORSify({"isValid": is_valid}), 200 if is_valid else 400
 
 
 def upd_category():
@@ -49,7 +49,7 @@ def upd_category():
             category[key] = data[key]
         category.save()
 
-    return jsonify({'isValid': is_valid})
+    return CORSify({'isValid': is_valid})
 
 
 def del_category():
@@ -67,11 +67,11 @@ def del_category():
     if category:
         category.delete()
 
-    return jsonify({'isValid': is_valid})
+    return CORSify({'isValid': is_valid})
 
 
 def del_all_categories():
     Category.objects.delete()
     count = Category.objects.count()
-    return jsonify({'count': count})
+    return CORSify({'count': count})
 

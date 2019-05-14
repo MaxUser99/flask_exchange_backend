@@ -1,12 +1,12 @@
 from models import Task, User, Status, Category
-# from models import Task
-from flask import jsonify, request
+from flask import request
 from schemas import TaskSchema
+from app import CORSify
 
 
 def get_all_tasks():
     tasks = Task.objects.all()
-    return jsonify({'result': tasks})
+    return CORSify({'result': tasks})
 
 
 def get_get_one_tasks():
@@ -14,7 +14,7 @@ def get_get_one_tasks():
     task = Task.objects.get(id=data['id']) \
         if 'id' in data and Task.objects(pk=data['id']).count() \
         else None
-    return jsonify({'result': task})
+    return CORSify({'result': task})
 
 
 def add_task():
@@ -35,56 +35,52 @@ def add_task():
             else None
     is_valid &= status
     if is_valid:
-        description = data['description'] if 'description' in data else ""
         new_task = Task(title=data['title'],
-                        description=description,
-                        # category=data['category'],
-                        # owner=data['owner'],
+                        description=data.get('description', ""),
                         status=data['status']
                         ).save()
         owner.update(push__posted_tasks=new_task.id)
         category.update(push__tasks=new_task.id)
-    return jsonify({'isValid': is_valid})
+    return CORSify({'isValid': is_valid})
 
 
 def upd_task():
-    pass
-    # data = request.get_json()
-    # is_valid = len(data.keys()) > 1 and TaskSchema.is_valid_for_update(data)
-    # task = Task.objects.get(id=data['id']) \
-    #     if is_valid and Task.objects(id=data['id']).count() \
-    #     else None
-    # if task:
-    #     for key in data:
-    #         allow = True
-    #         if key == 'id':
-    #             continue
-    #         elif key == 'sub':
-    #             curr_sub = User.objects.get(id=task[key]) if User.objects(id=task[key]).count() else None
-    #             new_sub = User.objects.get(id=data[key]) if User.objects(id=data[key]).count() else None
-    #             is_valid &= curr_sub and new_sub
-    #             if is_valid:
-    #                 curr_sub.update(pull__tasks=task.id)
-    #                 new_sub.update(push__tasks=task.id)
-    #         elif key == 'category':
-    #             curr_cat = Category.objects.get(id=task[key]) if Category.objects(id=task[key]).count() else None
-    #             new_cat = Category.objects.get(id=data[key]) if Category.objects(id=data[key]).count() else None
-    #             is_valid &= curr_cat and new_cat
-    #             if is_valid:
-    #                 curr_cat.update(pull__tasks=task.id)
-    #                 new_cat.update(push__tasks=task.id)
-    #         elif key == 'status':
-    #             new_stat = Status.objects.get(id=data[key]) if Status.objects(id=data[key]).count() else None
-    #             is_valid &= new_stat
-    #             allow = new_stat
-    #
-    #         if allow:
-    #             task[key] = data[key]
-    #
-    #     if is_valid:
-    #         task.save()
-    #
-    # return jsonify({"isValid": is_valid})
+    data = request.get_json()
+    is_valid = len(data.keys()) > 1 and TaskSchema.is_valid_for_update(data)
+    task = Task.objects.get(id=data['id']) \
+        if is_valid and Task.objects(id=data['id']).count() \
+        else None
+    if task:
+        for key in data:
+            allow = True
+            if key == 'id':
+                continue
+            elif key == 'sub':
+                curr_sub = User.objects.get(id=task[key]) if User.objects(id=task[key]).count() else None
+                new_sub = User.objects.get(id=data[key]) if User.objects(id=data[key]).count() else None
+                is_valid &= curr_sub and new_sub
+                if is_valid:
+                    curr_sub.update(pull__tasks=task.id)
+                    new_sub.update(push__tasks=task.id)
+            elif key == 'category':
+                curr_cat = Category.objects.get(id=task[key]) if Category.objects(id=task[key]).count() else None
+                new_cat = Category.objects.get(id=data[key]) if Category.objects(id=data[key]).count() else None
+                is_valid &= curr_cat and new_cat
+                if is_valid:
+                    curr_cat.update(pull__tasks=task.id)
+                    new_cat.update(push__tasks=task.id)
+            elif key == 'status':
+                new_stat = Status.objects.get(id=data[key]) if Status.objects(id=data[key]).count() else None
+                is_valid &= new_stat
+                allow = new_stat
+
+            if allow and key in task:
+                task[key] = data[key]
+
+        if is_valid:
+            task.save()
+
+    return CORSify({"isValid": is_valid})
 
 
 def del_task():
@@ -92,21 +88,26 @@ def del_task():
     is_valid = len(data.keys()) > 0 and TaskSchema.is_valid_for_delete(data)
     task = None
     if is_valid:
-        title = data['title'] if 'title' in data else None
-        _id = data['id'] if 'id' in data else None
+        title = data.get('title', None)
+        _id = data.get('id', None)
         if title and Task.objects(title=title).count() > 0:
             task = Task.objects.get(title=title)
         elif _id and Task.objects(pk=_id).count() > 0:
             task = Task.objects.get(id=_id)
 
+    deleted = False
     if task:
         task.delete()
+        deleted = True
 
-    return jsonify({'isValid': is_valid})
+    return CORSify({
+        'isValid': is_valid,
+        'deleted': deleted,
+    })
 
 
 def del_all_tasks():
     Task.objects.delete()
     count = Task.objects.count()
-    return jsonify({'count': count})
+    return CORSify({'count': count})
 

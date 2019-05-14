@@ -1,16 +1,17 @@
 from models import Status
-from flask import jsonify, request
+from flask import request
 from schemas import StatusSchema
+from app import CORSify
 
 
 def get_all_statuses():
     statuses = Status.objects.all()
-    return jsonify({'result': statuses})
+    return CORSify({'result': statuses})
 
 
 def get_one_status(name):
     status = Status.objects.get(name=name) if Status.objects(name=name).count() else None
-    return jsonify({'result': status})
+    return CORSify({'result': status})
 
 
 def add_status():
@@ -18,7 +19,7 @@ def add_status():
     is_valid = 'name' in data
     if is_valid:
         Status(name=data['name']).save()
-    return jsonify({"isValid": is_valid}), 200 if is_valid else 400
+    return CORSify({"isValid": is_valid}), 200 if is_valid else 400
 
 
 def upd_status():
@@ -26,7 +27,7 @@ def upd_status():
     is_valid = StatusSchema.is_valid_for_upd(data)
     if is_valid and Status.objects(pk=data['id']).count() > 0:
         Status.objects(pk=data['id']).update_one(set__name=data['name'])
-    return jsonify({'isValid': is_valid})
+    return CORSify({'isValid': is_valid})
 
 
 def del_status():
@@ -44,13 +45,13 @@ def del_status():
     if status:
         status.delete()
 
-    return jsonify({'isValid': is_valid})
+    return CORSify({'isValid': is_valid})
 
 
 def del_all_statuses():
     Status.objects.delete()
     count = Status.objects.count()
-    return jsonify({'count': count})
+    return CORSify({'count': count})
 
 
 
